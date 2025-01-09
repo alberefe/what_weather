@@ -1,5 +1,4 @@
 import functools
-from crypt import methods
 
 from flask import (
     Blueprint,
@@ -67,7 +66,7 @@ def login():
         if error is None:
             session.clear()
             session["user_id"] = user["id"]
-            return redirect(url_for("index"))
+            return redirect(url_for("weather.index"))
 
         flash(error)
 
@@ -91,7 +90,7 @@ def load_logged_in_user():
 @bp.route("/logout")
 def logout():
     session.clear()
-    return redirect(url_for("index"))
+    return redirect(url_for("weather.index"))
 
 
 # creating, updating, and deleting blog posts will require a user to be logged in

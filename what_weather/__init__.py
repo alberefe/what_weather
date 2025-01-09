@@ -1,6 +1,6 @@
-from flask import Flask
+from flask import Flask, redirect, url_for
 import os
-
+import redis
 from flask.cli import load_dotenv
 
 
@@ -12,8 +12,9 @@ def create_app(test_config=None):
     app.config.from_mapping(
         # the key should be changed in deployment
         SECRET_KEY="dev",
-        DATABASE=os.path.join(app.instance_path, "flaskr.sqlite"),
+        DATABASE=os.path.join(app.instance_path, "what_weather.sqlite"),
         WEATHERSTACK_API_KEY=os.getenv("WEATHERSTACK_API_KEY"),
+        REDIS_URL=os.getenv("REDIS_URL"),
         DEBUG=True
     )
 
@@ -34,6 +35,14 @@ def create_app(test_config=None):
     from . import db
 
     db.init_app(app)
+
+    from . import redis_cache
+
+    redis_cache.init_app(app)
+
+    @app.route("/")
+    def index():
+        return redirect(url_for('weather.index'))
 
     from . import auth
 
