@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Weather{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+  {# Show the search form #}
+  <form method="post">
+    <label for="city">City</label>
+    <input name="city" id="city" required>
+    <input type="submit" value="Check Weather">
+  </form>
+
+  {# If we have weather data, display it #}
+  {% if weather %}
+    <div class="weather-results">
+      <h2>Weather in {{ location.name }}, {{ location.country }}</h2>
+      <div class="weather-details">
+        <p>Temperature: {{ weather.temperature }}°C</p>
+        <p>Feels like: {{ weather.feelslike }}°C</p>
+        <p>Weather description: {{ weather.weather_descriptions[0] }}</p>
+        <p>Humidity: {{ weather.humidity }}%</p>
+        <p>Wind: {{ weather.wind_speed }} km/h</p>
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}
