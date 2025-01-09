@@ -11,7 +11,7 @@ def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         # the key should be changed in deployment
-        SECRET_KEY="dev",
+        SECRET_KEY=os.getenv('SECRET_KEY'),
         DATABASE=os.path.join(app.instance_path, "what_weather.sqlite"),
         WEATHERSTACK_API_KEY=os.getenv("WEATHERSTACK_API_KEY"),
         REDIS_URL=os.getenv("REDIS_URL"),
