@@ -8,11 +8,13 @@ def get_redis_client():
 
     return g.redis
 
+
 def close_redis_client(e=None):
     redis_client = g.pop("redis", None)
 
     if redis_client is not None:
         redis_client.close()
 
+
 def init_app(app):
-    app.teardown_appcontext(close_redis_client)
+    (app.teardown_appcontext(close_redis_client))

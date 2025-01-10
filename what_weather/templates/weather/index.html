@@ -1,32 +1,32 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}Weather{% endblock %}</h1>
+    <h1>{% block title %}Weather{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
-  {# Show the search form #}
-  <form method="post">
-    <label for="city">City</label>
-    <input name="city" id="city" required>
-    <input type="submit" value="Check Weather">
-  </form>
+    {# Show the search form #}
+    <form method="post">
+        <label for="city">City</label>
+        <input name="city" id="city" required>
+        <input type="submit" value="Check Weather">
+    </form>
 
     <div class="actions">
-    <a href="{{ url_for('weather.view_history') }}">View Search History</a>
-  </div>
-
-  {# If we have weather data, display it #}
-  {% if weather_data %}
-    <div class="weather-results">
-      <h2>Weather in {{ location.name }}, {{ location.country }}</h2>
-      <div class="weather-details">
-        <p>Temperature: {{ weather_data.temperature }}°C</p>
-        <p>Feels like: {{ weather_data.feelslike }}°C</p>
-        <p>Weather description: {{ weather_data.weather_descriptions[0] }}</p>
-        <p>Humidity: {{ weather_data.humidity }}%</p>
-        <p>Wind: {{ weather_data.wind_speed }} km/h</p>
-      </div>
+        <a href="{{ url_for('weather.view_history') }}">View Search History</a>
     </div>
-  {% endif %}
+
+    {# If we have weather data, display it #}
+    {% if weather_data %}
+        <div class="weather-results">
+            <h2>Weather in {{ location.name }}, {{ location.country }}</h2>
+            <div class="weather-details">
+                <p>Temperature: {{ weather_data.temperature }}°C</p>
+                <p>Feels like: {{ weather_data.feelslike }}°C</p>
+                <p>Weather description: {{ weather_data.weather_descriptions[0] }}</p>
+                <p>Humidity: {{ weather_data.humidity }}%</p>
+                <p>Wind: {{ weather_data.wind_speed }} km/h</p>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}

@@ -8,10 +8,11 @@ CREATE TABLE user
     password TEXT        NOT NULL
 );
 
-CREATE TABLE search_history (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    city TEXT NOT NULL,
+CREATE TABLE search_history
+(
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id     INTEGER NOT NULL,
+    city        TEXT    NOT NULL,
     searched_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES user (id)
 );

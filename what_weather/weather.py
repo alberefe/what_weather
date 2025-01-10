@@ -8,7 +8,7 @@ from flask import (
     request,
     session,
     url_for,
-    current_app
+    current_app,
 )
 import requests
 import json
@@ -30,8 +30,8 @@ def get_weather_data(city):
 
     # API requests
     params_request = {
-        'access_key': current_app.config['WEATHERSTACK_API_KEY'],
-        'query': city,
+        "access_key": current_app.config["WEATHERSTACK_API_KEY"],
+        "query": city,
     }
 
     try:
@@ -40,7 +40,7 @@ def get_weather_data(city):
 
         if cached_data:
             try:
-                weather_data = json.loads(cached_data.decode('utf-8'))
+                weather_data = json.loads(cached_data.decode("utf-8"))
                 return weather_data, None
             except json.decoder.JSONDecodeError:
                 # If it's corrupted, fetch new data
@@ -48,9 +48,7 @@ def get_weather_data(city):
 
         # If no cache or corrupted cache, make API call
         response = requests.get(
-            'https://api.weatherstack.com/current',
-            params=params_request,
-            timeout=10
+            "https://api.weatherstack.com/current", params=params_request, timeout=10
         )
         # check if the request was successful
         response.raise_for_status()
@@ -58,8 +56,8 @@ def get_weather_data(city):
         # Parse the JSON response
         weather_data = response.json()
 
-        if 'error' in weather_data:
-            return None, weather_data['error']
+        if "error" in weather_data:
+            return None, weather_data["error"]
 
         # try to store the results in cache
         try:
@@ -73,16 +71,16 @@ def get_weather_data(city):
         # If redis is down, fallback to direct API call
         try:
             response = requests.get(
-                'https://api.weatherstack.com/current',
+                "https://api.weatherstack.com/current",
                 params=params_request,
-                timeout=10
+                timeout=10,
             )
             response.raise_for_status()
 
             weather_data = response.json()
 
-            if 'error' in weather_data:
-                return None, weather_data['error']
+            if "error" in weather_data:
+                return None, weather_data["error"]
 
             return weather_data, None
 
@@ -114,17 +112,21 @@ def index():
 
             else:
                 save_search(g.user["id"], city)
-                return render_template('weather/index.html',
-                                       weather_data=weather_data['current'],
-                                       location=weather_data['location'])
+                return render_template(
+                    "weather/index.html",
+                    weather_data=weather_data["current"],
+                    location=weather_data["location"],
+                )
 
-    return render_template('weather/index.html')
+    return render_template("weather/index.html")
 
 
 def save_search(user_id, city):
     db = get_db()
-    db.execute('INSERT INTO search_history (user_id, city, searched_at) VALUES (?, ?, ?)',
-               (user_id, city, datetime.now()))
+    db.execute(
+        "INSERT INTO search_history (user_id, city, searched_at) VALUES (?, ?, ?)",
+        (user_id, city, datetime.now()),
+    )
     db.commit()
 
 
@@ -133,9 +135,9 @@ def save_search(user_id, city):
 def view_history():
     db = get_db()
     search_list = db.execute(
-        'SELECT city, searched_at FROM search_history'
-        ' WHERE user_id = ?'
-        ' ORDER BY searched_at DESC',
-        (g.user['id'],)
+        "SELECT city, searched_at FROM search_history"
+        " WHERE user_id = ?"
+        " ORDER BY searched_at DESC",
+        (g.user["id"],),
     ).fetchall()
-    return render_template('weather/history.html', search_list=search_list)
+    return render_template("weather/history.html", search_list=search_list)

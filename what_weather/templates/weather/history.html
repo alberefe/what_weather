@@ -1,34 +1,34 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}Search History{% endblock %}</h1>
+    <h1>{% block title %}Search History{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
-  <div class="search-history">
-    {% if search_list %}
-      <table>
-        <thead>
-          <tr>
-            <th>City</th>
-            <th>Searched At</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for search in search_list %}
-            <tr>
-              <td>{{ search['city'] }}</td>
-              <td>{{ search['searched_at'] }}</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    {% else %}
-      <p>No search history found.</p>
-    {% endif %}
-  </div>
+    <div class="search-history">
+        {% if search_list %}
+            <table>
+                <thead>
+                <tr>
+                    <th>City</th>
+                    <th>Searched At</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for search in search_list %}
+                    <tr>
+                        <td>{{ search['city'] }}</td>
+                        <td>{{ search['searched_at'] }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No search history found.</p>
+        {% endif %}
+    </div>
 
-  <div class="actions">
-    <a href="{{ url_for('weather.index') }}" class="back-link">Back to Weather Search</a>
-  </div>
+    <div class="actions">
+        <a href="{{ url_for('weather.index') }}" class="back-link">Back to Weather Search</a>
+    </div>
 {% endblock %}

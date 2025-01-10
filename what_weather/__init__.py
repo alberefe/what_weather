@@ -11,11 +11,11 @@ def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         # the key should be changed in deployment
-        SECRET_KEY=os.getenv('SECRET_KEY'),
+        SECRET_KEY=os.getenv("SECRET_KEY"),
         DATABASE=os.path.join(app.instance_path, "what_weather.sqlite"),
         WEATHERSTACK_API_KEY=os.getenv("WEATHERSTACK_API_KEY"),
         REDIS_URL=os.getenv("REDIS_URL"),
-        DEBUG=True
+        DEBUG=True,
     )
 
     if test_config is None:
@@ -42,7 +42,7 @@ def create_app(test_config=None):
 
     @app.route("/")
     def index():
-        return redirect(url_for('weather.index'))
+        return redirect(url_for("weather.index"))
 
     from . import auth
 
@@ -51,6 +51,5 @@ def create_app(test_config=None):
     from . import weather
 
     app.register_blueprint(weather.bp)
-
 
     return app

@@ -1,0 +1,42 @@
+[project]
+name = "what_weather"
+version = "0.1.0"
+description = "A weather application with Redis caching and SQLite storage"
+requires-python = ">=3.8"
+dependencies = [
+    # Core web framework
+    "flask>=2.0.0",
+    # External services interaction
+    "requests>=2.31.0",
+    # Caching
+    "redis>=5.0.0",
+    # For environment variables (recommended for API keys)
+    "python-dotenv>=1.0.0",
+    "python-telegram-bot>=21.6",
+]
+
+[project.optional-dependencies]
+dev = [
+    # Development tools
+    "pytest>=7.0.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.1.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = ["error"]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.9.0",
+]
+
+[tool.flake8]
+max-line-length = 88  # To match Black
+extend-ignore = ["E203"]  # To avoid conflicts with Black
+max-complexity = 10
