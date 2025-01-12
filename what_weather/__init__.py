@@ -1,6 +1,5 @@
 from flask import Flask, redirect, url_for
 import os
-import redis
 from flask.cli import load_dotenv
 
 
