@@ -2,8 +2,10 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Create non-root user
-RUN groupadd -r appusergroup && useradd -r -g appusergroup appuser
+# Create non-root user and set up home directory properly
+RUN groupadd -r appusergroup && \
+    useradd -r -g appusergroup -m -d /home/appuser appuser && \
+    chown -R appuser:appusergroup /home/appuser
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -12,24 +14,29 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy project files first - this is different from before
+# Copy project files
 COPY . .
 
-# Set ownership
+# Set ownership of application files
 RUN chown -R appuser:appusergroup /app
 
-# Switch to non-root user for package installation
+# Switch to non-root user
 USER appuser
 
-# Install uv and dependencies
-RUN pip install --user uv && \
-    $HOME/.local/bin/uv pip install -e .
+# Create and set up pip cache directory and install uv
+RUN mkdir -p /home/appuser/.cache/pip && \
+    pip install --user uv
 
-# Create and set permissions for instance directory
+# Create virtual environment using uv and install dependencies
+RUN $HOME/.local/bin/uv venv && \
+    . .venv/bin/activate && \
+    PYTHONPATH=/app $HOME/.local/bin/uv pip install -e .
+
+# Create instance directory (switch back to root temporarily)
 USER root
 RUN mkdir -p instance && chown -R appuser:appusergroup instance
 
-# Switch back to non-root user for running the application
+# Switch back to non-root user
 USER appuser
 
 EXPOSE 5000
