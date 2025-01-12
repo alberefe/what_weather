@@ -23,10 +23,15 @@ RUN chown -R appuser:appusergroup /app
 # Switch to non-root user
 USER appuser
 
-# Create and set up pip cache directory
+# Create and set up pip cache directory and install uv
 RUN mkdir -p /home/appuser/.cache/pip && \
-    pip install --user uv && \
-    PYTHONPATH=/app $HOME/.local/bin/uv pip install -e .
+    pip install --user uv
+
+# Create virtual environment using uv and install dependencies
+RUN $HOME/.local/bin/uv venv && \
+    . .venv/bin/activate && \
+    $HOME/.local/bin/uv pip install -e .
+
 
 # Create instance directory (switch back to root temporarily)
 USER root
