@@ -26,7 +26,7 @@ services:
       - ./instance:/app/instance
       - ./certs:/app/certs
     environment:
-      - FLASK_APP=what_weather:create_app
+      - FLASK_APP=what_weather
       - FLASK_DEBUG=0
       - FLASK_RUN_HOST=0.0.0.0
       - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
