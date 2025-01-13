@@ -23,7 +23,6 @@ services:
       dockerfile: Dockerfile
     restart: unless-stopped
     volumes:
-      - ./instance:/app/instance
       - ./certs:/app/certs
     environment:
       - FLASK_APP=what_weather
@@ -32,6 +31,7 @@ services:
       - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
       - ALLOWED_HOSTS=api.telegram.org,*.telegram.org
       - REDIS_URL=redis://redis:6379/0
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
       interval: 30s
@@ -45,6 +45,7 @@ services:
         max-file: "3"
     depends_on:
       - redis
+      - postgres
 
   redis:
     image: redis:7.2-alpine
@@ -68,5 +69,29 @@ services:
         max-size: "10m"
         max-file: "3"
 
+  postgres:
+    image: postgres:latest
+    container_name: postgresql_db
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
 volumes:
   redis_data:
+  postgres_data:

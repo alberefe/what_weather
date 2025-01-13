@@ -7,11 +7,12 @@ RUN groupadd -r appusergroup && \
     useradd -r -g appusergroup -m -d /home/appuser appuser && \
     chown -R appuser:appusergroup /home/appuser
 
-# Install system dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
     libffi-dev \
     curl \
+    libpq-dev \
+    postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy project files
@@ -22,14 +23,6 @@ COPY . .
 
 # Set ownership of application files and ensure the appuser has write permissions
 RUN chown -R appuser:appusergroup /app
-
-# Ensure the 'instance' directory and database have proper ownership and permissions
-RUN chown -R appuser:appusergroup /app/instance && \
-    chmod -R u+w /app/instance
-
-# Set permissions for the specific SQLite database file
-RUN chown appuser:appusergroup /app/instance/what_weather.sqlite && \
-    chmod u+w /app/instance/what_weather.sqlite
 
 # Switch to non-root user
 USER appuser
@@ -46,13 +39,6 @@ RUN $HOME/.local/bin/uv venv && \
 # Set environment variable for the virtual environment
 ENV VIRTUAL_ENV=/app/.venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-
-# Create instance directory (switch back to root temporarily if needed)
-USER root
-RUN mkdir -p instance && chown -R appuser:appusergroup instance
-
-# Switch back to non-root user
-USER appuser
 
 # Set the environment variable for Flask
 ENV FLASK_APP=what_weather
