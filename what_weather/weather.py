@@ -1,3 +1,5 @@
+from what_weather.app_factory import db
+from what_weather.database_models import *
 import redis
 from flask import (
     Blueprint,
@@ -13,7 +15,6 @@ from flask import (
 import requests
 import json
 from datetime import datetime
-from what_weather.db import get_db
 from what_weather.auth import login_required
 from what_weather.redis_cache import get_redis_client
 
@@ -111,7 +112,7 @@ def index():
                 flash(error)
 
             else:
-                save_search(g.user["id"], city)
+                save_search(g.user.user_id, city)
                 return render_template(
                     "weather/index.html",
                     weather_data=weather_data["current"],
@@ -122,22 +123,15 @@ def index():
 
 
 def save_search(user_id, city):
-    db = get_db()
-    db.execute(
-        "INSERT INTO search_history (user_id, city, searched_at) VALUES (?, ?, ?)",
-        (user_id, city, datetime.now()),
-    )
-    db.commit()
+    user_id = user_id
+    city = city.lower()
+    search = SearchHistory(user_id=user_id, city=city, searched_at=datetime.now())
+    db.session.add(search)
+    db.session.commit()
 
 
 @bp.route("/history")
 @login_required
 def view_history():
-    db = get_db()
-    search_list = db.execute(
-        "SELECT city, searched_at FROM search_history"
-        " WHERE user_id = ?"
-        " ORDER BY searched_at DESC",
-        (g.user["id"],),
-    ).fetchall()
+    search_list = db.session.query(SearchHistory).filter_by(user_id=g.user.user_id).all()
     return render_template("weather/history.html", search_list=search_list)
