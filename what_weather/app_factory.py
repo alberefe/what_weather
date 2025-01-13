@@ -1,6 +1,5 @@
 from flask import Flask, redirect, url_for
 import os
-import redis
 from flask.cli import load_dotenv
 from flask_sqlalchemy import SQLAlchemy
 
@@ -48,6 +47,7 @@ def create_app(test_config=None):
     from what_weather import redis_cache
 
     redis_cache.init_app(app)
+
 
     @app.route("/")
     def index():
