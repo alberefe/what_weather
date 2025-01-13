@@ -1,6 +1,6 @@
-from what_weather import create_app
+from what_weather.app_factory import create_app, db
 
-app = create_app()
 
 if __name__ == '__main__':
+    app = create_app()
     app.run(host='0.0.0.0', port=5000)
