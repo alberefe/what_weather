@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     libffi-dev \
     curl \
     libpq-dev \
+    libssl-dev \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
@@ -43,7 +44,7 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 # Set the environment variable for Flask
 ENV FLASK_APP=what_weather
 
-# Expose the app's port
+# Expose the app's port and the telegram webhook port
 EXPOSE 5000
 
 # Command to run the app from __init__.py

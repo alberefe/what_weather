@@ -1,0 +1,53 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Create non-root user for security best practices
+RUN groupadd -r botgroup && \
+    useradd -r -g botgroup -m -d /home/botuser botuser && \
+    chown -R botuser:botgroup /home/botuser
+
+# Install system dependencies
+# We need curl for healthchecks and SSL-related packages for Telegram webhook
+RUN apt-get update && apt-get install -y \
+    gcc \
+    libffi-dev \
+    curl \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy your bot-specific requirements and project files
+COPY requirements ./
+COPY pyproject.toml ./
+COPY uv.lock ./
+COPY . .
+
+# Set ownership of application files
+RUN chown -R botuser:botgroup /app
+
+# Switch to non-root user for security
+USER botuser
+
+# Set up pip cache and install uv package manager
+RUN mkdir -p /home/botuser/.cache/pip && \
+    pip install --user uv
+
+# Create and configure virtual environment
+RUN $HOME/.local/bin/uv venv && \
+    . .venv/bin/activate && \
+    $HOME/.local/bin/uv pip install -e .
+
+# Configure virtual environment paths
+ENV VIRTUAL_ENV=/app/.venv
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+# Expose port 8443 for Telegram webhooks
+EXPOSE 8443
+
+# Start the bot
+CMD ["python", "-m", "what_weather.telegram_bot"]
+
+# Healthcheck to ensure bot is running
+# Note: Adjust the healthcheck endpoint according to your bot's implementation
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8443/health || exit 1

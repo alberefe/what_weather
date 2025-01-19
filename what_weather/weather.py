@@ -1,3 +1,4 @@
+import os
 from what_weather.app_factory import db
 from what_weather.database_models import *
 import redis
@@ -15,8 +16,11 @@ from flask import (
 import requests
 import json
 from datetime import datetime
+from dotenv import load_dotenv
 from what_weather.auth import login_required
 from what_weather.redis_cache import get_redis_client
+
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 
 bp = Blueprint("weather", __name__, url_prefix="/weather")
 
@@ -135,3 +139,4 @@ def save_search(user_id, city):
 def view_history():
     search_list = db.session.query(SearchHistory).filter_by(user_id=g.user.user_id).all()
     return render_template("weather/history.html", search_list=search_list)
+
