@@ -18,29 +18,46 @@ from what_weather.database_models import *
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 
+def register_user(username: str, password: str) -> tuple[bool, str]:
+    error = None
+
+    if not username:
+        error = "Username is required."
+    elif not password:
+        error = "Password is required."
+    elif db.session.query(User).filter_by(username=username).scalar() is not None:
+        error = f"User {username} is already registered."
+
+    if error is None:
+        db.session.add(
+            User(username=username, password=generate_password_hash(password))
+        )
+        db.session.commit()
+        return (
+            True,
+            "Registered successfully.",
+        )
+
+    return False, error
+
+
 @bp.route("/register", methods=("GET", "POST"))
-def register():
+def register_view():
     if request.method == "POST":
-        username = request.form["username"]
+
+        username = request.form["username"],
         password = request.form["password"]
 
-        error = None
+        success, message = register_user(
+            username,
+            password
+        )
 
-        if not username:
-            error = "Username is required."
-        elif not password:
-            error = "Password is required."
-        elif (
-            db.session.query(User).filter_by(username=username).scalar() is not None
-        ):
-            error = f"User {username} is already registered."
+        if success:
+            return redirect(url_for("auth.login_view"))
 
-        if error is None:
-            db.session.add(User(username=username, password=generate_password_hash(password)))
-            db.session.commit()
-            return redirect(url_for("auth.login"))
+        flash(message)
 
-        flash(error)
     return render_template("auth/register.html")
 
 
@@ -76,9 +93,7 @@ def load_logged_in_user():
     if user_id is None:
         g.user = None
     else:
-        g.user = (
-            db.session.query(User).filter_by(user_id=user_id).scalar()
-        )
+        g.user = db.session.query(User).filter_by(user_id=user_id).scalar()
 
 
 # to log out you need to remove the user id from the session
