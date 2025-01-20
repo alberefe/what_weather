@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from flask import Flask, redirect, url_for
+from datetime import datetime
+
+from flask import Flask, jsonify, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 from what_weather import config
@@ -8,6 +10,7 @@ from what_weather.config import config
 
 # Create the object to deal with the database
 db = SQLAlchemy()
+
 
 
 def create_app(config_name=None):
@@ -42,5 +45,15 @@ def create_app(config_name=None):
     from what_weather import weather
 
     app.register_blueprint(weather.bp)
+
+    # TODO: create proper healthcheck
+    @app.route("/health")
+    def health_check():
+        health_status ={
+            "status" : "healthy",
+            "timestamp": datetime.now().isoformat(),
+        }
+
+        return jsonify(health_status), 200
 
     return app
