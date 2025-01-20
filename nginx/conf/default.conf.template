@@ -1,6 +1,7 @@
 # Main HTTPS server configuration
 server {
     listen 443 ssl;
+
     server_name ${SERVER_NAME};
 
     # SSL certificate paths
