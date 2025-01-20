@@ -60,6 +60,8 @@ select = [
     "N",
     "D",
     "ANN",
+    "D212",
+    "D200"
 ]
 
 ignore = [
@@ -73,6 +75,8 @@ quote-style = "double"
 indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
+docstring-code-format = true
+docstring-code-line-length = "dynamic"
 
 # Import sorting configuration
 [tool.ruff.isort]
@@ -81,5 +85,6 @@ combine-as-imports = true
 required-imports = ["from __future__ import annotations"]
 
 # Documentation style
-[tool.ruff.pydocstyle]
+
+[tool.ruff.lint.pydocstyle]
 convention = "google"
