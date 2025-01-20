@@ -1,32 +1,29 @@
-import os
-from what_weather.app_factory import db
-from what_weather.database_models import *
-import redis
-from flask import (
-    Blueprint,
-    flash,
-    g,
-    redirect,
-    render_template,
-    request,
-    session,
-    url_for,
-    current_app,
-)
-import requests
+from __future__ import annotations
+
 import json
 from datetime import datetime
-from dotenv import load_dotenv
-from what_weather.auth import login_required
-from what_weather.redis_cache import get_redis_client
 
+import redis
+import requests
+from flask import (
+    Blueprint,
+    current_app,
+    flash,
+    g,
+    render_template,
+    request,
+)
+
+from what_weather.app_factory import db
+from what_weather.auth import login_required
+from what_weather.database_models import *
+from what_weather.redis_cache import get_redis_client
 
 bp = Blueprint("weather", __name__, url_prefix="/weather")
 
 
 def get_weather_data(city):
-    """
-    Makes the request to the weather API and returns data for a city
+    """Makes the request to the weather API and returns data for a city
     :param city: string
     """
     CACHE_TTL = 3600
@@ -98,8 +95,7 @@ def get_weather_data(city):
 @bp.route("/", methods=("GET", "POST"))
 @login_required
 def index():
-    """
-    Displays the form and process the weather queries.
+    """Displays the form and process the weather queries.
     :return:
     """
     if request.method == "POST":

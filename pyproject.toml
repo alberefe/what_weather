@@ -38,11 +38,48 @@ filterwarnings = ["error"]
 
 [dependency-groups]
 dev = [
-    "black>=24.8.0",
-    "pylint>=3.2.7",
+    "ruff>=0.9.2",
 ]
 
-[tool.flake8]
-max-line-length = 88  # To match Black
-extend-ignore = ["E203"]  # To avoid conflicts with Black
-max-complexity = 10
+[tool.ruff]
+# Core configuration
+target-version = "py311"
+line-length = 88
+extend-exclude = [".venv", "venv", "env", "__pycache__", "migrations"]
+
+# Rule selection
+select = [
+    "E",
+    "W",
+    "F",
+    "I",
+    "C",
+    "B",
+    "UP",
+    "RUF",
+    "N",
+    "D",
+    "ANN",
+]
+
+ignore = [
+    "ANN101",
+    "ANN102",
+]
+
+# Ruff format configuration
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+# Import sorting configuration
+[tool.ruff.isort]
+known-first-party = ["what_weather"]
+combine-as-imports = true
+required-imports = ["from __future__ import annotations"]
+
+# Documentation style
+[tool.ruff.pydocstyle]
+convention = "google"

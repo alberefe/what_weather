@@ -1,5 +1,9 @@
+from __future__ import annotations
+
 from datetime import datetime
+
 from what_weather.app_factory import db
+
 
 class User(db.Model):
     __tablename__ = "user"

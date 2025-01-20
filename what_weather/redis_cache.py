@@ -1,5 +1,7 @@
-from flask import current_app, g
+from __future__ import annotations
+
 import redis
+from flask import current_app, g
 
 
 def get_redis_client():

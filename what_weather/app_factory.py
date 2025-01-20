@@ -1,11 +1,10 @@
-from urllib import request
+from __future__ import annotations
 
-import requests
+from flask import Flask, redirect, url_for
+from flask_sqlalchemy import SQLAlchemy
 
 from what_weather import config
 from what_weather.config import config
-from flask import Flask, redirect, url_for
-from flask_sqlalchemy import SQLAlchemy
 
 # Create the object to deal with the database
 db = SQLAlchemy()
@@ -23,7 +22,6 @@ def create_app(config_name=None):
     # Connect the database to the flask app
     db.init_app(app)
 
-    from what_weather import database_models
 
     # Create tables of the database
     with app.app_context():
