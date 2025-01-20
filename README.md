@@ -22,19 +22,25 @@ Flask-based weather application that provides real-time weather data through the
 - SSL/TLS support
 - IP access restriction for security
 
-## Prerequisites
+## Dependencies
 
-- Docker and Docker Compose
-- Python 3.11 or higher (for local development)
-- SSL certificates (for HTTPS)
+I use uv for dependencies so:
+
+```
+$ uv sync
+```
+
+Will use the uv.lock file to manage all the necessary dependencies.
 
 ## Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/alberefe/what_weather
 cd what_weather
 ```
+
 2. Create a .env file in the root directory with the following data:
 
 ```
