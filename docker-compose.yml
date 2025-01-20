@@ -30,8 +30,6 @@ services:
       - FLASK_APP=what_weather
       - FLASK_DEBUG=0
       - FLASK_RUN_HOST=0.0.0.0
-      - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
-      - ALLOWED_HOSTS=api.telegram.org,*.telegram.org
       - REDIS_URL=redis://redis:6379/0
       - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
     healthcheck:
@@ -48,29 +46,6 @@ services:
     depends_on:
       - redis
       - postgres
-
-  telegram_bot:
-    build:
-      context: .
-      dockerfile: Dockerfile_bot
-    restart: unless-stopped
-    environment:
-      - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
-      - WEBHOOK_URL=https://0.0.0.0:8443/webhook
-      - FLASK_APP_URL=https://what_weather:5000
-      - PYTHONPATH=/app
-    depends_on:
-      - what_weather
-    expose:
-      - "8443"
-    volumes:
-      - ./certs:/app/certs
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
 
   redis:
     image: redis:7.2-alpine

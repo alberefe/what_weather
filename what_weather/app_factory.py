@@ -1,5 +1,3 @@
-import json
-import os
 from urllib import request
 
 import requests
@@ -46,47 +44,5 @@ def create_app(config_name=None):
     from what_weather import weather
 
     app.register_blueprint(weather.bp)
-
-
-    # TODO: find a nice place to leave this
-    @app.route("/webhook", methods=["POST"])
-    def bot_webhook():
-        if request.method == "POST":
-            req = request.get_json()
-
-            chat_id = req["message"]["chat"]["id"]
-
-            if "message" in req and "text" in req["message"]:
-                message = req["message"]["text"].strip()
-
-                # Passes the city name to the thing.
-                weather_response = weather.get_weather_data(message)
-
-                telegram_response = {
-                    "chat_id": chat_id,
-                    "text": weather_response
-                }
-
-                # Send response
-                response = requests.post(
-                    f"{https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage}",
-                    json=telegram_response,
-                )
-
-                return {"ok": True}
-
-            else:
-                # Handle invalid message format
-                telegram_response = {
-                    "chat_id": chat_id,
-                    "text": "What did you mean by that?"
-                }
-
-                requests.post(
-                    f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
-                    json=telegram_response
-                )
-
-                return {"ok": True}
 
     return app

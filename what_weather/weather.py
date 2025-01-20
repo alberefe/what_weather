@@ -20,7 +20,6 @@ from dotenv import load_dotenv
 from what_weather.auth import login_required
 from what_weather.redis_cache import get_redis_client
 
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 
 bp = Blueprint("weather", __name__, url_prefix="/weather")
 
