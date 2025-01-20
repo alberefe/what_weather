@@ -8,9 +8,8 @@ from flask_sqlalchemy import SQLAlchemy
 from what_weather import config
 from what_weather.config import config
 
-# Create the object to deal with the database
+# Create the object to interact with the database
 db = SQLAlchemy()
-
 
 
 def create_app(config_name=None):

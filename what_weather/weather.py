@@ -22,9 +22,14 @@ from what_weather.redis_cache import get_redis_client
 bp = Blueprint("weather", __name__, url_prefix="/weather")
 
 
-def get_weather_data(city):
-    """Makes the request to the weather API and returns data for a city
-    :param city: string
+def get_weather_data(city : str) -> dict:
+    """Calls the api and returns the weather data retrieved from it.
+
+    Args:
+        city: the city or town we want the weather data from
+
+    Returns:
+        weather_data : the weather data retrieved
     """
     CACHE_TTL = 3600
     cache_key = f"weather:city:{city.lower()}"
@@ -95,9 +100,7 @@ def get_weather_data(city):
 @bp.route("/", methods=("GET", "POST"))
 @login_required
 def index():
-    """Displays the form and process the weather queries.
-    :return:
-    """
+    """Displays the form and process the weather queries."""
     if request.method == "POST":
         city = request.form.get("city")
 
@@ -122,6 +125,13 @@ def index():
 
 
 def save_search(user_id, city):
+    """Saves the search of the user.
+
+    Args:
+        user_id: id of the user that did the search
+        city: the city searched
+
+    """
     user_id = user_id
     city = city.lower()
     search = SearchHistory(user_id=user_id, city=city, searched_at=datetime.now())
