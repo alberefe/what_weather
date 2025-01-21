@@ -21,6 +21,16 @@ bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 
 def register_user(username: str, password: str) -> tuple[bool, str]:
+    """Handles the registration logic.
+
+    Args:
+        username: the name
+        password: the password
+
+    Returns:
+        bool: True if the login was successful, False otherwise
+        str: error or success message
+    """
     error = None
 
     if not username:
@@ -63,23 +73,44 @@ def register_view():
     return render_template("auth/register.html")
 
 
+def login_user(username : str, password: str) -> tuple[bool, str]:
+    """Handles the log in logic.
+
+    Args:
+        username: the name
+        password: the password
+
+    Returns:
+        bool: True if the login was successful, False otherwise
+        str: error or success message
+    """
+    error = None
+
+    user = db.session.query(User).filter_by(username=username).scalar()
+
+    if user is None:
+        error = "Incorrect username."
+    elif not check_password_hash(user.password, password):
+        error = "Incorrect password."
+
+    if error is None:
+        session.clear()
+        session["user_id"] = user.user_id
+        return (True, "Logged in successfully.")
+
+    return False, error
+
+
 @bp.route("/login", methods=("GET", "POST"))
-def login():
+def login_view():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
         error = None
 
-        user = db.session.query(User).filter_by(username=username).scalar()
+        success, message = login_user(username, password)
 
-        if user is None:
-            error = "Incorrect username."
-        elif not check_password_hash(user.password, password):
-            error = "Incorrect password."
-
-        if error is None:
-            session.clear()
-            session["user_id"] = user.user_id
+        if success:
             return redirect(url_for("weather.index"))
 
         flash(error)
@@ -111,7 +142,7 @@ def login_required(view):
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if g.user is None:
-            return redirect(url_for("auth.login"))
+            return redirect(url_for("auth.login_view"))
         return view(**kwargs)
 
     return wrapped_view
