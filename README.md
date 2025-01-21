@@ -33,7 +33,7 @@ git clone https://github.com/alberefe/what_weather
 cd what_weather
 ```
 
-2.Dependencies
+2. Dependencies
 
 I use uv for dependencies so:
 
@@ -113,5 +113,3 @@ The application runs in four containers:
 - `what_weather`: Flask application
 - `redis`: Caching server
 - `postgres`: Database server
-
-
