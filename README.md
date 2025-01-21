@@ -1,5 +1,5 @@
 
-Currently working on testing + logging.
+Currently working on testing + logging + better exception and error handling. Parked for the moment while I finish my degree.
 
 # What Weather
 ---
