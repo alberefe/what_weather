@@ -22,15 +22,7 @@ Flask-based weather application that provides real-time weather data through the
 - SSL/TLS support
 - IP access restriction for security
 
-## Dependencies
 
-I use uv for dependencies so:
-
-```
-$ uv sync
-```
-
-Will use the uv.lock file to manage all the necessary dependencies.
 
 ## Installation
 
@@ -41,7 +33,17 @@ git clone https://github.com/alberefe/what_weather
 cd what_weather
 ```
 
-2. Create a .env file in the root directory with the following data:
+2.Dependencies
+
+I use uv for dependencies so:
+
+```
+$ uv sync
+```
+
+Will use the uv.lock file to manage all the necessary dependencies.
+
+3. Create a .env file in the root directory with the following data:
 
 ```
 WEATHERSTACK_API_KEY=your_weatherstack_api_key
@@ -57,12 +59,12 @@ DB_NAME=flask_app_database
 
 Make sure you replace the corresponding dummy data for the relevant.
 
-3. Create your self signed certificates (or place yours) in /certs    (relative to the root directory of the project)
+4. Create your self signed certificates (or place yours) in /certs    (relative to the root directory of the project)
 
-4. Modify the template for nginx and write your own data, like your server ip.
+5. Modify the template for nginx and write your own data, like your server ip.
 
 
-5. Run the application using docker compose
+6. Run the application using docker compose
 
 ```
 $ docker-compose up --build
