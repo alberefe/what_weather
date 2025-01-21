@@ -1,3 +1,6 @@
+
+Currently working on testing + logging.
+
 # What Weather
 ---
 
