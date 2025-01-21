@@ -58,7 +58,6 @@ select = [
     "UP",
     "RUF",
     "N",
-    "D",
     "ANN",
     "D212",
     "D200"
@@ -67,6 +66,7 @@ select = [
 ignore = [
     "ANN101",
     "ANN102",
+    "D"
 ]
 
 # Ruff format configuration
