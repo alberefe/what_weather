@@ -5,15 +5,49 @@
 {% endblock %}
 
 {% block content %}
-    {# Show the search form #}
-    <form method="post">
-        <label for="city">City</label>
-        <input name="city" id="city" required>
-        <input type="submit" value="Check Weather">
-    </form>
+    <div class="search-container">
+        {# Enhanced search form with multiple options #}
+        <form method="post" id="weather-form">
+            <div class="search-section">
+                <h3>Search by City</h3>
+                <div class="input-group">
+                    <label for="city">City</label>
+                    <div class="autocomplete-container">
+                        <input name="city" id="city" type="text" placeholder="Start typing a city name...">
+                        <div id="autocomplete-suggestions" class="autocomplete-suggestions"></div>
+                    </div>
+                    <button type="button" id="use-location-btn" class="location-btn">📍 Use My Location</button>
+                </div>
+                
+                {# Recent searches dropdown #}
+                <div class="recent-searches">
+                    <label for="recent-dropdown">Recent Searches:</label>
+                    <select id="recent-dropdown">
+                        <option value="">Select a recent search...</option>
+                    </select>
+                </div>
+            </div>
 
-    <div class="actions">
-        <a href="{{ url_for('weather.view_history') }}">View Search History</a>
+            <div class="search-section">
+                <h3>Or Search by Coordinates</h3>
+                <div class="coordinates-group">
+                    <div class="coord-input">
+                        <label for="lat">Latitude</label>
+                        <input name="lat" id="lat" type="number" step="any" placeholder="e.g., 40.7128">
+                    </div>
+                    <div class="coord-input">
+                        <label for="lng">Longitude</label>
+                        <input name="lng" id="lng" type="number" step="any" placeholder="e.g., -74.0060">
+                    </div>
+                </div>
+            </div>
+
+            <input type="submit" value="Check Weather" class="submit-btn">
+        </form>
+
+        <div class="actions">
+            <a href="{{ url_for('weather.view_history') }}">View Search History</a>
+        </div>
     </div>
 
     {# If we have weather data, display it #}
@@ -29,4 +63,154 @@
             </div>
         </div>
     {% endif %}
+
+    <script>
+        // Autocomplete functionality
+        let autocompleteTimeout;
+        const cityInput = document.getElementById('city');
+        const suggestionsDiv = document.getElementById('autocomplete-suggestions');
+        
+        cityInput.addEventListener('input', function() {
+            clearTimeout(autocompleteTimeout);
+            const query = this.value.trim();
+            
+            if (query.length < 2) {
+                suggestionsDiv.innerHTML = '';
+                suggestionsDiv.style.display = 'none';
+                return;
+            }
+            
+            autocompleteTimeout = setTimeout(() => {
+                fetch(`/weather/api/cities/autocomplete?q=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(suggestions => {
+                        suggestionsDiv.innerHTML = '';
+                        
+                        if (suggestions.length > 0) {
+                            suggestions.forEach(suggestion => {
+                                const div = document.createElement('div');
+                                div.className = 'suggestion-item';
+                                div.textContent = suggestion.display;
+                                div.addEventListener('click', () => {
+                                    cityInput.value = suggestion.name;
+                                    // Store coordinates for potential use
+                                    cityInput.dataset.lat = suggestion.lat;
+                                    cityInput.dataset.lng = suggestion.lng;
+                                    suggestionsDiv.innerHTML = '';
+                                    suggestionsDiv.style.display = 'none';
+                                });
+                                suggestionsDiv.appendChild(div);
+                            });
+                            suggestionsDiv.style.display = 'block';
+                        } else {
+                            suggestionsDiv.style.display = 'none';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Autocomplete error:', error);
+                        suggestionsDiv.style.display = 'none';
+                    });
+            }, 300);
+        });
+
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.autocomplete-container')) {
+                suggestionsDiv.style.display = 'none';
+            }
+        });
+
+        // Geolocation functionality
+        document.getElementById('use-location-btn').addEventListener('click', function() {
+            if (!navigator.geolocation) {
+                alert('Geolocation is not supported by this browser.');
+                return;
+            }
+
+            this.textContent = '📍 Getting location...';
+            this.disabled = true;
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    document.getElementById('lat').value = lat.toFixed(6);
+                    document.getElementById('lng').value = lng.toFixed(6);
+                    document.getElementById('city').value = '';
+                    
+                    this.textContent = '📍 Use My Location';
+                    this.disabled = false;
+                },
+                (error) => {
+                    let message = 'Unable to get your location. ';
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            message += 'Location access denied.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            message += 'Location information unavailable.';
+                            break;
+                        case error.TIMEOUT:
+                            message += 'Location request timed out.';
+                            break;
+                    }
+                    alert(message);
+                    
+                    this.textContent = '📍 Use My Location';
+                    this.disabled = false;
+                }
+            );
+        });
+
+        // Recent searches functionality
+        function loadRecentSearches() {
+            fetch('/weather/api/recent-searches')
+                .then(response => response.json())
+                .then(searches => {
+                    const dropdown = document.getElementById('recent-dropdown');
+                    // Clear existing options except the first one
+                    dropdown.innerHTML = '<option value="">Select a recent search...</option>';
+                    
+                    searches.forEach(search => {
+                        const option = document.createElement('option');
+                        option.value = search.city;
+                        option.textContent = search.city;
+                        dropdown.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error loading recent searches:', error));
+        }
+
+        // Load recent searches on page load
+        loadRecentSearches();
+
+        // Handle recent search selection
+        document.getElementById('recent-dropdown').addEventListener('change', function() {
+            if (this.value) {
+                document.getElementById('city').value = this.value;
+                document.getElementById('lat').value = '';
+                document.getElementById('lng').value = '';
+            }
+        });
+
+        // Form validation
+        document.getElementById('weather-form').addEventListener('submit', function(e) {
+            const city = document.getElementById('city').value.trim();
+            const lat = document.getElementById('lat').value.trim();
+            const lng = document.getElementById('lng').value.trim();
+            
+            if (!city && (!lat || !lng)) {
+                e.preventDefault();
+                alert('Please enter a city name or coordinates (both latitude and longitude).');
+                return;
+            }
+            
+            if ((lat && !lng) || (!lat && lng)) {
+                e.preventDefault();
+                alert('Please enter both latitude and longitude for coordinate search.');
+                return;
+            }
+        });
+    </script>
 {% endblock %}
