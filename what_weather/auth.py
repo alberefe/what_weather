@@ -57,7 +57,7 @@ def register_user(username: str, password: str) -> tuple[bool, str]:
 def register_view():
     if request.method == "POST":
 
-        username = request.form["username"],
+        username = request.form["username"]
         password = request.form["password"]
 
         success, message = register_user(
@@ -113,7 +113,7 @@ def login_view():
         if success:
             return redirect(url_for("weather.index"))
 
-        flash(error)
+        flash(message)
 
     return render_template("auth/login.html")
 
